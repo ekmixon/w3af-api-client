@@ -38,10 +38,7 @@ class Details(object):
 
         :return: The JSON data
         """
-        if self._data is not None:
-            return self._data
-
-        return self.update()
+        return self._data if self._data is not None else self.update()
 
     def update(self):
         code, data = self.conn.send_request(self.resource_href, method='GET')

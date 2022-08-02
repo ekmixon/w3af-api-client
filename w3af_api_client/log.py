@@ -65,7 +65,7 @@ class Log(object):
                 because there is no need to keep track of the already read
                 entries in a specific page.
         """
-        url = '/scans/%s/log?id=%s' % (self.scan_id, start_id)
+        url = f'/scans/{self.scan_id}/log?id={start_id}'
         code, page = self.conn.send_request(url, method='GET')
 
         if code != 200:
@@ -86,7 +86,7 @@ class Log(object):
         """
         :yield: Log entries for the given page number
         """
-        url = '/scans/%s/log?page=%s' % (self.scan_id, page_number)
+        url = f'/scans/{self.scan_id}/log?page={page_number}'
         code, page = self.conn.send_request(url, method='GET')
 
         if code != 200:

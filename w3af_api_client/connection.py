@@ -100,9 +100,12 @@ class Connection(object):
         self.session = requests.Session()
         self.session.verify = verify
 
-        headers = {'Content-Type': 'application/json',
-                   'Accept': 'application/json',
-                   'User-Agent': 'REST API Client %s' % __VERSION__}
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'User-Agent': f'REST API Client {__VERSION__}',
+        }
+
         self.session.headers.update(headers)
 
     def send_request(self, path, json_data=None, method='GET'):
@@ -143,14 +146,13 @@ class Connection(object):
 
             if error is not None:
                 raise exception_klass(error)
-            else:
-                msg = ('REST API service did not return the expected "message"'
-                       ' attribute for the %s response. Please create a new'
-                       ' issue in the w3af framework repository at %s with'
-                       ' this JSON data:\n\n%s')
-                dump = json.dumps(json_data, indent=4)
-                args = (response.status_code, ISSUE_URL, dump)
-                raise APIException(msg % args)
+            msg = ('REST API service did not return the expected "message"'
+                   ' attribute for the %s response. Please create a new'
+                   ' issue in the w3af framework repository at %s with'
+                   ' this JSON data:\n\n%s')
+            dump = json.dumps(json_data, indent=4)
+            args = (response.status_code, ISSUE_URL, dump)
+            raise APIException(msg % args)
 
         return response.status_code, json_data
 
@@ -161,8 +163,7 @@ class Connection(object):
         code, data = self.send_request('/scans/', method='GET')
 
         if code != 200:
-            msg = 'Failed to retrieve scans. Unexpected code %s'
-            raise APIException(msg % code)
+            raise APIException(f'Failed to retrieve scans. Unexpected code {code}')
 
         scans = data.get('items', None)
 

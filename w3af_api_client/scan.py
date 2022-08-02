@@ -39,8 +39,10 @@ class Scan(object):
     def get_status(self):
         assert self.scan_id is not None, 'No scan_id has been set'
 
-        code, data = self.conn.send_request('/scans/%s/status' % self.scan_id,
-                                            method='GET')
+        code, data = self.conn.send_request(
+            f'/scans/{self.scan_id}/status', method='GET'
+        )
+
 
         if code != 200:
             message = data.get('message', 'None')
@@ -52,7 +54,7 @@ class Scan(object):
 
     def pause(self):
         assert self.scan_id is not None, 'No scan_id has been set'
-        self.conn.send_request('/scans/%s/pause' % self.scan_id, method='GET')
+        self.conn.send_request(f'/scans/{self.scan_id}/pause', method='GET')
 
     def stop(self, timeout=None):
         """
@@ -72,7 +74,7 @@ class Scan(object):
         #   Simple stop
         #
         if timeout is None:
-            url = '/scans/%s/stop' % self.scan_id
+            url = f'/scans/{self.scan_id}/stop'
             self.conn.send_request(url, method='GET')
             return
 
@@ -93,15 +95,14 @@ class Scan(object):
 
     def cleanup(self):
         assert self.scan_id is not None, 'No scan_id has been set'
-        self.conn.send_request('/scans/%s' % self.scan_id, method='DELETE')
+        self.conn.send_request(f'/scans/{self.scan_id}', method='DELETE')
 
     def get_log(self):
         assert self.scan_id is not None, 'No scan_id has been set'
         return Log(conn=self.conn, scan_id=self.scan_id)
 
     def get_findings(self):
-        code, data = self.conn.send_request('/scans/%s/kb/' % self.scan_id,
-                                            method='GET')
+        code, data = self.conn.send_request(f'/scans/{self.scan_id}/kb/', method='GET')
 
         if code != 200:
             raise APIException('Failed to retrieve findings')
@@ -114,7 +115,7 @@ class Scan(object):
         return [Finding(self.conn, f['href']) for f in findings]
 
     def get_exceptions(self):
-        url = '/scans/%s/exceptions/' % self.scan_id
+        url = f'/scans/{self.scan_id}/exceptions/'
         code, data = self.conn.send_request(url, method='GET')
 
         if code != 200:
@@ -131,7 +132,7 @@ class Scan(object):
         return [ScannerException(self.conn, e['href']) for e in exceptions]
 
     def get_urls(self):
-        url = '/scans/%s/urls/' % self.scan_id
+        url = f'/scans/{self.scan_id}/urls/'
         code, data = self.conn.send_request(url, method='GET')
 
         if code != 200:
@@ -145,7 +146,7 @@ class Scan(object):
         return urls
 
     def get_fuzzable_requests(self):
-        url = '/scans/%s/fuzzable-requests/' % self.scan_id
+        url = f'/scans/{self.scan_id}/fuzzable-requests/'
         code, data = self.conn.send_request(url, method='GET')
 
         if code != 200:

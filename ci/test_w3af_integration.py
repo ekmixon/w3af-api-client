@@ -51,7 +51,7 @@ class TestW3afIntegration(unittest.TestCase):
 
         findings_list = scan.get_findings()
         self.assertGreaterEqual(len(findings_list), 4)
-        print('Got %s findings' % len(findings_list))
+        print(f'Got {len(findings_list)} findings')
 
         finding = findings_list[0]
         self.assertIsInstance(finding, Finding)
@@ -72,8 +72,7 @@ class TestW3afIntegration(unittest.TestCase):
         # UDP is connection-less, no packets are sent to 4.4.4.2
         # I use port 80, but could use any port
         sock.connect((connect_target, 80))
-        local_address = sock.getsockname()[0]
-        return local_address
+        return sock.getsockname()[0]
 
     def wait_until_running(self, scan):
         """

@@ -66,12 +66,12 @@ class upload(PyPIRCCommand):
     def upload_file(self, command, pyversion, filename):
         # Makes sure the repository URL is compliant
         schema, netloc, url, params, query, fragments = \
-            urlparse(self.repository)
+                urlparse(self.repository)
         if params or query or fragments:
-            raise AssertionError("Incompatible url %s" % self.repository)
+            raise AssertionError(f"Incompatible url {self.repository}")
 
         if schema not in ('http', 'https'):
-            raise AssertionError("unsupported schema " + schema)
+            raise AssertionError(f"unsupported schema {schema}")
 
         # Sign if requested
         if self.sign:
@@ -125,23 +125,25 @@ class upload(PyPIRCCommand):
         if command == 'bdist_rpm':
             dist, version, id = platform.dist()
             if dist:
-                comment = 'built for %s %s' % (dist, version)
+                comment = f'built for {dist} {version}'
         elif command == 'bdist_dumb':
             comment = 'built for %s' % platform.platform(terse=1)
         data['comment'] = comment
 
         if self.sign:
-            data['gpg_signature'] = (os.path.basename(filename) + ".asc",
-                                     open(filename+".asc").read())
+            data['gpg_signature'] = (
+                f"{os.path.basename(filename)}.asc",
+                open(f"{filename}.asc").read(),
+            )
+
 
         # set up the authentication
-        auth = "Basic " + standard_b64encode(self.username + ":" +
-                                             self.password)
+        auth = ("Basic " + standard_b64encode((f"{self.username}:" + self.password)))
 
         # Build up the MIME payload for the POST data
         boundary = '--------------GHSKFJDLGDS7543FJKLFHRE75642756743254'
         sep_boundary = '\n--' + boundary
-        end_boundary = sep_boundary + '--'
+        end_boundary = f'{sep_boundary}--'
         body = BytesIO()
         for key, value in data.items():
             # handle multiple entries for the same name
@@ -165,13 +167,15 @@ class upload(PyPIRCCommand):
         body.write("\n")
         body = body.getvalue()
 
-        self.announce("Submitting %s to %s" % (filename, self.repository), log.INFO)
+        self.announce(f"Submitting {filename} to {self.repository}", log.INFO)
 
         # build the Request
-        headers = {'Content-type':
-                        'multipart/form-data; boundary=%s' % boundary,
-                   'Content-length': str(len(body)),
-                   'Authorization': auth}
+        headers = {
+            'Content-type': f'multipart/form-data; boundary={boundary}',
+            'Content-length': str(len(body)),
+            'Authorization': auth,
+        }
+
 
         request = Request(self.repository, data=body,
                           headers=headers)
@@ -191,9 +195,8 @@ class upload(PyPIRCCommand):
             reason = e.msg
 
         if status == 200:
-            self.announce('Server response (%s): %s' % (status, reason),
-                          log.INFO)
+            self.announce(f'Server response ({status}): {reason}', log.INFO)
         else:
-            msg = 'Upload failed (%s): %s' % (status, reason)
+            msg = f'Upload failed ({status}): {reason}'
             self.announce(msg, log.ERROR)
             raise DistutilsError(msg)
